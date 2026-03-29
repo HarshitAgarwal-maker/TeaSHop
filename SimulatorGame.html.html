@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Street Hustle</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background: #111;
+  color: #fff;
+  margin: 0;
+  padding: 20px;
+}
+
+h1 {
+  margin-bottom: 10px;
+}
+
+#money {
+  font-size: 28px;
+  margin: 10px 0;
+}
+
+button {
+  padding: 15px;
+  margin: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+#earnBtn {
+  background: #28a745;
+  color: white;
+  width: 80%;
+}
+
+.upgrade {
+  background: #333;
+  color: white;
+  width: 80%;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+</style>
+</head>
+
+<body>
+
+<h1>☕ Street Hustle</h1>
+
+<div id="money">₹0</div>
+
+<button id="earnBtn" onclick="earnMoney()">SELL CHAI ☕</button>
+
+<p>Customers served: <span id="customers">0</span></p>
+
+<h3>Upgrades</h3>
+
+<button class="upgrade" onclick="buyUpgrade(50, 'click')">
+Better Stove (+1/click) - ₹50
+</button>
+
+<button class="upgrade" onclick="buyUpgrade(200, 'auto')">
+Hire Worker (+1/sec) - ₹200
+</button>
+
+<button class="upgrade" onclick="buyUpgrade(1000, 'autoBig')">
+Auto Machine (+5/sec) - ₹1000
+</button>
+
+<p id="nextUnlock">Next unlock at ₹500: Tea Shop 🔒</p>
+
+<script>
+let money = 0;
+let perClick = 1;
+let autoIncome = 0;
+let customers = 0;
+
+// Load saved data
+function loadGame() {
+  let save = JSON.parse(localStorage.getItem("streetHustleSave"));
+
+  if (save) {
+    money = save.money || 0;
+    perClick = save.perClick || 1;
+    autoIncome = save.autoIncome || 0;
+    customers = save.customers || 0;
+  }
+}
+
+// Save game
+function saveGame() {
+  localStorage.setItem("streetHustleSave", JSON.stringify({
+    money,
+    perClick,
+    autoIncome,
+    customers
+  }));
+}
+
+// Earn money
+function earnMoney() {
+  money += perClick;
+  customers++;
+  animateButton();
+  updateUI();
+}
+
+// Buy upgrades
+function buyUpgrade(cost, type) {
+  if (money >= cost) {
+    money -= cost;
+
+    if (type === "click") perClick += 1;
+    if (type === "auto") autoIncome += 1;
+    if (type === "autoBig") autoIncome += 5;
+
+    updateUI();
+  }
+}
+
+// Passive income
+setInterval(() => {
+  money += autoIncome;
+  updateUI();
+}, 1000);
+
+// Auto save every 3 seconds
+setInterval(saveGame, 3000);
+
+// Update UI
+function updateUI() {
+  document.getElementById("money").innerText = "₹" + Math.floor(money);
+  document.getElementById("customers").innerText = customers;
+
+  // Unlock message change
+  if (money >= 500) {
+    document.getElementById("nextUnlock").innerText =
+      "🎉 Tea Shop Unlocked (Coming Soon!)";
+  }
+}
+
+// Button animation
+function animateButton() {
+  let btn = document.getElementById("earnBtn");
+  btn.style.transform = "scale(0.9)";
+  setTimeout(() => {
+    btn.style.transform = "scale(1)";
+  }, 100);
+}
+
+// Initialize game
+loadGame();
+updateUI();
+</script>
+
+</body>
+</html>
